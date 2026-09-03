@@ -1,29 +1,28 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-// --- DRIVER 1 PINS (Assume Left Side Motors) ---
-const int ENA1 = 32;
-const int IN1 = 33;
-const int IN2 = 25;
-const int IN3 = 26;
-const int IN4 = 27;
-const int ENB1 = 14;
+// --- DRIVER 1 PINS (Left Motors) ---
+const int ENA1 = 32; // Connected to P32
+const int IN1 = 33;  // Connected to P33
+const int IN2 = 25;  // Connected to P25
+const int IN3 = 26;  // Connected to P26
+const int IN4 = 27;  // Connected to P27
+const int ENB1 = 14; // Connected to P14
 
-// --- DRIVER 2 PINS (Assume Right Side Motors) ---
-const int ENA2 = 22;
-const int IN5 = 16; // RX2
-const int IN6 = 17; // TX2
-const int IN7 = 18;
-const int IN8 = 19;
-const int ENB2 = 23;
+// --- DRIVER 2 PINS (Right Motors) ---
+const int ENA2 = 22; // Connected to P22
+const int IN5 = 16;  // Connected to P16
+const int IN6 = 17;  // Connected to P17
+const int IN7 = 18;  // Connected to P18
+const int IN8 = 19;  // Connected to P19
+const int ENB2 = 23; // Connected to P23
 
-// Set the Hotspot Name and Password for this specific rover
-const char* ssid = "RoverX_Team1"; 
-const char* password = "password123";
+// --- NETWORK CREDENTIALS ---
+const char* ssid = "yourwifiname"; 
+const char* password = "yourpwd";
 
 WebServer server(80);
 
-// Minimal HTML/CSS Interface for Mobile Browsers
 const char* htmlPage = R"rawliteral(
 <!DOCTYPE html>
 <html>
@@ -58,7 +57,7 @@ void setup() {
     pinMode(pins[i], OUTPUT);
   }
 
-  // Set motor speed (0 to 255)
+  // Set default full speed for all four motors (0 to 255)
   analogWrite(ENA1, 255);
   analogWrite(ENB1, 255);
   analogWrite(ENA2, 255);
@@ -70,7 +69,7 @@ void setup() {
   Serial.print("Connect phone to Wi-Fi: "); Serial.println(ssid);
   Serial.print("Open browser to IP: "); Serial.println(IP);
 
-  // Map URLs to Movement Functions
+  // Map web URLs to hardware functions
   server.on("/", []() { server.send(200, "text/html", htmlPage); });
   server.on("/forward", []() { moveForward(); server.send(200, "text/plain", "Forward"); });
   server.on("/backward", []() { moveBackward(); server.send(200, "text/plain", "Backward"); });
@@ -100,14 +99,14 @@ void moveBackward() {
   digitalWrite(IN7, LOW); digitalWrite(IN8, HIGH);
 }
 
-void turnLeft() { // Skid steer: Left motors reverse, Right motors forward
+void turnLeft() { 
   digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);
   digitalWrite(IN5, HIGH); digitalWrite(IN6, LOW);
   digitalWrite(IN7, HIGH); digitalWrite(IN8, LOW);
 }
 
-void turnRight() { // Skid steer: Left motors forward, Right motors reverse
+void turnRight() { 
   digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
   digitalWrite(IN5, LOW); digitalWrite(IN6, HIGH);
@@ -120,3 +119,5 @@ void stopMotors() {
   digitalWrite(IN5, LOW); digitalWrite(IN6, LOW);
   digitalWrite(IN7, LOW); digitalWrite(IN8, LOW);
 }
+
+
